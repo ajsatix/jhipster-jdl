@@ -1,0 +1,155 @@
+application {
+  config {
+    applicationType microservice
+    authenticationType jwt
+    baseName QuizService
+    buildTool maven
+    cacheProvider hazelcast
+    clientPackageManager yarn
+    databaseType sql
+    devDatabaseType h2Disk
+    enableHibernateCache true
+    enableSwaggerCodegen false
+    enableTranslation false
+    jhiPrefix jhi
+    jhipsterVersion "5.2.1"
+   
+    languages [en, fr]
+    messageBroker false
+    nativeLanguage en
+    packageName com.kloudlearn.quiz
+    prodDatabaseType mysql
+    searchEngine false
+    serverPort 8081
+    serviceDiscoveryType eureka
+    skipClient true
+    skipUserManagement true
+    testFrameworks [gatling]
+    websocket false
+  }
+
+  entities Person, PersonAttempt, PersonAttemptAttachment, PersonAttemptLabel, PersonAttemptOption, PersonQuiz, PersonQuizLatest, PersonType, Question, QuestionAttachment, QuestionLabel, QuestionOption, QuestionType, Quiz, QuizAttachment
+}
+
+entity Person {
+  personId Long,
+  name String,
+  orgId Long
+}
+entity PersonAttempt {
+  score Integer,
+  attemptedAt ZonedDateTime,
+  isGraded Boolean,
+  courseResourceId Long,
+  attemptCount Integer
+}
+entity PersonAttemptAttachment {
+  assetId Long,
+  assetType String,
+  assetUrl String
+}
+entity PersonAttemptLabel {
+  label String,
+  maxStar Integer,
+  gradedStar Integer,
+  labelId Long
+}
+entity PersonAttemptOption {
+  attemptedOptionId Long,
+  attemptedOptionValue TextBlob,
+  score Integer,
+  createdAt ZonedDateTime
+}
+entity PersonQuiz {
+  quizScore Integer,
+  attemptedAt ZonedDateTime,
+  courseResourceId Long,
+  attemptCount Integer,
+  quizGraded Boolean
+}
+entity PersonQuizLatest {
+  quizScore Integer,
+  attemptedAt ZonedDateTime,
+  courseResourceId Long,
+  attemptCount Integer
+}
+entity PersonType {
+  quizId Long,
+  type String
+}
+entity Question {
+  order Integer,
+  score Integer,
+  questionText TextBlob,
+  createdBy Long,
+  createdAt ZonedDateTime,
+  updatedBy Long,
+  updatedAt ZonedDateTime
+}
+entity QuestionAttachment {
+  assetId Long,
+  assetType String,
+  createdBy Long,
+  createdAt ZonedDateTime
+}
+entity QuestionLabel {
+  label String,
+  maxStar Integer
+}
+entity QuestionOption {
+  order Integer,
+  score Integer,
+  optionValue TextBlob,
+  isAnswer Boolean,
+  createdBy Long,
+  createdAt ZonedDateTime,
+  updatedBy Long,
+  updatedAt ZonedDateTime
+}
+entity QuestionType {
+  questionType String,
+  createdBy Long,
+  createdAt ZonedDateTime
+}
+entity Quiz {
+  name String,
+  orgId Long,
+  createdBy Long,
+  createdAt ZonedDateTime,
+  updatedBy Long,
+  updatedAt ZonedDateTime
+}
+entity QuizAttachment {
+  assetId Long,
+  assetType String,
+  createdBy Long,
+  createdAt ZonedDateTime
+}
+relationship OneToOne {
+  PersonAttempt{personAttemptAttachment} to PersonAttemptAttachment{personAttempt}
+}
+relationship OneToMany {
+  PersonQuiz{personAttempt} to PersonAttempt{personQuiz},
+  PersonAttempt{personAttemptOption} to PersonAttemptOption{personAttempt},
+  Quiz{question} to Question{quiz},
+  Question{questionAttachment} to QuestionAttachment{question},
+  Question{questionOption} to QuestionOption{question}
+}
+relationship ManyToOne {
+  Person{personType} to PersonType,
+  PersonAttempt{person} to Person,
+  PersonAttempt{question} to Question,
+  PersonAttempt{quiz} to Quiz,
+  PersonAttemptLabel{personAttempt} to PersonAttempt,
+  PersonQuiz{person} to Person,
+  PersonQuiz{quiz} to Quiz,
+  PersonQuizLatest{person} to Person,
+  PersonQuizLatest{quiz} to Quiz,
+  Question{questionType} to QuestionType,
+  QuestionLabel{question} to Question
+}
+
+paginate Person, PersonAttempt, PersonAttemptAttachment, PersonQuiz, PersonType, Question, QuestionAttachment, QuestionOption, QuestionType, Quiz with pagination
+service Person, PersonAttempt, PersonAttemptAttachment, PersonAttemptLabel, PersonAttemptOption, PersonQuiz, PersonType, Question, QuestionAttachment, QuestionLabel, QuestionOption, QuestionType, Quiz with serviceClass
+microservice Person, PersonAttempt, PersonAttemptAttachment, PersonAttemptLabel, PersonAttemptOption, PersonQuiz, PersonQuizLatest, PersonType, Question, QuestionAttachment, QuestionLabel, QuestionOption, QuestionType, Quiz, QuizAttachment with QuizService
+clientRootFolder Person, PersonAttempt, PersonAttemptAttachment, PersonAttemptOption, PersonQuiz, PersonType, Question, QuestionAttachment, QuestionOption, QuestionType, Quiz, QuizAttachment with QuizService
