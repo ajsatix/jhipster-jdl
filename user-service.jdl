@@ -1,0 +1,276 @@
+application {
+  config {
+    applicationType microservice
+    authenticationType jwt
+    baseName UserService
+    buildTool maven
+    cacheProvider ehcache
+    clientPackageManager yarn
+    databaseType sql
+    devDatabaseType h2Memory
+    enableHibernateCache true
+    enableSwaggerCodegen false
+    enableTranslation false
+    jhiPrefix jhi
+    jhipsterVersion "5.2.1"
+    jwtSecretKey "7a27af717ba212cd3849d497a6d28cff6d1594e2"
+    languages [en, fr]
+    messageBroker false
+    nativeLanguage en
+    packageName com.xedflix.userservice
+    prodDatabaseType mysql
+    searchEngine false
+    serverPort 8083
+    serviceDiscoveryType eureka
+    skipClient true
+    skipUserManagement true
+    testFrameworks []
+    websocket false
+  }
+
+  entities Badge, BadgeAssignment, BadgeRule, BadgeTemplate, BadgeTemplateAssignment, BadgeToTemplate, Certificate, CertificateAssignment, CertificateElements, EndUserResourceAccess, EntityList, ExtendedUser, Group, GroupToUser, JobRole, Organization, OrganizationUser, OrganizationUserInvite, PermissionOnEntity, Role, Skill, UserBadge, UserCertificate, UserCourseActivity, UserCourseActivityHistory, UserJobRole, UserOnboardingStatus, UserResourceAccessPermission, UserSkill
+}
+
+entity Badge {
+  name String,
+  description String,
+  createdBy Long,
+  imageUrl String,
+  orgId Long
+}
+entity BadgeAssignment {
+  badgeId Long,
+  userId Long,
+  groupId Long
+}
+entity BadgeRule {
+  badgeId Long,
+  tableName String,
+  recordId Long,
+  columnName String,
+  criteria String
+}
+entity BadgeTemplate {
+  name String,
+  description String,
+  orgId Long
+}
+entity BadgeTemplateAssignment {
+  templateId Long,
+  assignmentType String,
+  assignedToId Long
+}
+/**
+ * The BadgeToTemplate entity.
+ * @author A true hipster
+ */
+entity BadgeToTemplate {
+  badgeId Long,
+  templateId Long
+}
+entity Certificate {
+  name String,
+  description String,
+  template Boolean,
+  crossCheckWithDatabase Boolean,
+  certificateUrl String,
+  orgId Long,
+  createdBy Long,
+  modifiedAt ZonedDateTime,
+  createdAt ZonedDateTime,
+  imageUrl String
+}
+entity CertificateAssignment {
+  certificateId Long,
+  attachedToType String,
+  attachedToId Long
+}
+entity CertificateElements {
+  key String,
+  value String,
+  /**
+   * if image then URL, else just a textBox
+   */
+  type String
+}
+/**
+ * Resource level permission.
+ * Much granular than an entity
+ * 
+ * u1 | v1 | video
+ * u1 | l1 | livestream
+ * u1 | v2 | video
+ */
+entity EndUserResourceAccess {
+  resourceId Integer,
+  resourceType ResourceType
+}
+entity EntityList {
+  name String required
+}
+entity ExtendedUser {
+  userId Long required,
+  phone String required
+}
+entity Group {
+  name String,
+  description String,
+  avatarUrl String,
+  status String,
+  organizationId Long,
+  userId Long,
+  createdAt ZonedDateTime,
+  updatedAt ZonedDateTime,
+  addedBy Long,
+  updatedBy Long
+}
+entity GroupToUser {
+  userId Long,
+  joined Boolean,
+  joinedDate ZonedDateTime,
+  groupId Long,
+  addedBy Long,
+  updatedBy Long,
+  createdAt ZonedDateTime,
+  updatedAt ZonedDateTime
+}
+entity JobRole {
+  name String required,
+  description String
+}
+entity Organization {
+  name String required,
+  email String required,
+  phone String required,
+  address String required,
+  isArchived Boolean
+}
+entity OrganizationUser {
+  userId Long required,
+  organizationId Long required
+}
+entity OrganizationUserInvite {
+  email String required,
+  isMailSent Boolean required,
+  key String required,
+  createdAt LocalDate,
+  organizationId Long,
+  invitedBy Long,
+  isCanceled Boolean,
+  hasAccepted Boolean,
+  phone String
+}
+/**
+ * Entity level permissions
+ */
+entity PermissionOnEntity {
+  entityName String required,
+  canCreate Boolean required,
+  canRead Boolean required,
+  canUpdate Boolean required,
+  canDelete Boolean required
+}
+entity Role {
+  role Roles
+}
+entity Skill {
+  name String required,
+  points Long,
+  createdAt ZonedDateTime,
+  updatedAt ZonedDateTime,
+  rating Integer
+}
+entity UserBadge {
+  userId Long,
+  badgeId Long,
+  progress Long,
+  status String
+}
+entity UserCertificate {
+  userId Long,
+  certificateId Long,
+  courseId Long,
+  userCertificateUrl String,
+  metadata TextBlob,
+  modifiedAt ZonedDateTime,
+  createdAt ZonedDateTime,
+  userCertificateImageUrl String
+}
+entity UserCourseActivity {
+  userId Long required,
+  courseId Long required,
+  activityType String required,
+  moduleId Long required,
+  resourceType String required,
+  resourceId Long required,
+  createdAt Instant,
+  updatedAt Instant
+}
+entity UserCourseActivityHistory {
+  userId Long,
+  courseId Long,
+  activityType String,
+  resourceType String,
+  resourceId Long,
+  createdAt Instant
+}
+entity UserJobRole {
+  userId Long required
+}
+entity UserOnboardingStatus {
+  userId Long,
+  status Integer
+}
+entity UserResourceAccessPermission {
+  userId Long,
+  resourceId Long,
+  resourceType ResourceType,
+  permissionLastGivenBy Long,
+  createdAt ZonedDateTime
+}
+entity UserSkill {
+  userId Long,
+  orgId Long,
+  skill String,
+  rating Integer,
+  points Integer,
+  acquiredByResourceType AcquiredByResource,
+  acquiredByResourceId Long,
+  createdAt ZonedDateTime,
+  updatedAt ZonedDateTime
+}
+enum ResourceType {
+  Video,
+  Course,
+  CourseResource,
+  CourseModule
+}
+enum Roles {
+  SYSTEM_ADMIN,
+  ORG_ADMIN,
+  CONTENT_CREATOR,
+  END_USER
+}
+enum AcquiredByResource {
+  ASSET,
+  COURSE
+}
+
+relationship OneToMany {
+  ExtendedUser{permissionOnEntity} to PermissionOnEntity{user(userId) required}
+}
+relationship ManyToOne {
+  Certificate{certificateElements} to CertificateElements,
+  EndUserResourceAccess{user(userId) required} to ExtendedUser,
+  UserJobRole{jobRole required} to JobRole
+}
+relationship ManyToMany {
+  JobRole{skill required} to Skill{jobRole}
+}
+
+paginate Badge, BadgeAssignment, BadgeRule, BadgeTemplate, BadgeTemplateAssignment, Certificate, CertificateAssignment, CertificateElements, EndUserResourceAccess, EntityList, Group, GroupToUser, JobRole, Organization, OrganizationUserInvite, PermissionOnEntity, Skill, UserBadge, UserCertificate, UserCourseActivity, UserCourseActivityHistory, UserJobRole, UserOnboardingStatus, UserResourceAccessPermission, UserSkill with pagination
+service Badge, BadgeAssignment, BadgeRule, BadgeTemplate, BadgeTemplateAssignment, Certificate, CertificateAssignment, CertificateElements, EndUserResourceAccess, EntityList, ExtendedUser, Group, GroupToUser, JobRole, Organization, OrganizationUserInvite, PermissionOnEntity, Skill, UserBadge, UserCertificate, UserCourseActivity, UserCourseActivityHistory, UserJobRole, UserOnboardingStatus, UserResourceAccessPermission, UserSkill with serviceClass
+microservice Badge, BadgeAssignment, BadgeRule, BadgeTemplate, BadgeTemplateAssignment, BadgeToTemplate, Certificate, CertificateAssignment, CertificateElements, EndUserResourceAccess, EntityList, ExtendedUser, Group, GroupToUser, JobRole, Organization, OrganizationUser, OrganizationUserInvite, PermissionOnEntity, Role, Skill, UserBadge, UserCertificate, UserCourseActivity, UserCourseActivityHistory, UserJobRole, UserOnboardingStatus, UserResourceAccessPermission, UserSkill with UserService
+dto Group, GroupToUser, JobRole, Skill, UserJobRole, UserSkill with mapstruct
+clientRootFolder Group, GroupToUser, JobRole, Skill, UserJobRole, UserOnboardingStatus, UserSkill with UserService
+filter UserResourceAccessPermission
