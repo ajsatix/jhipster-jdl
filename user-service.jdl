@@ -13,7 +13,7 @@ application {
     enableTranslation false
     jhiPrefix jhi
     jhipsterVersion "5.2.1"
-    jwtSecretKey "7a27af717ba212cd3849d497a6d28cff6d1594e2"
+
     languages [en, fr]
     messageBroker false
     nativeLanguage en
