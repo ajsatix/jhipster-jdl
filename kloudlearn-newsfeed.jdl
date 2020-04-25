@@ -13,7 +13,7 @@ application {
     enableTranslation false
     jhiPrefix jhi
     jhipsterVersion "5.2.1"
-    jwtSecretKey "76742c0e84c18c45546862f884b7b259ec0095de"
+  
     languages [en, fr]
     messageBroker kafka
     nativeLanguage en
